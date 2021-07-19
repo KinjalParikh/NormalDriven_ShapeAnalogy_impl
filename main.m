@@ -1,18 +1,22 @@
 [Vi,Fi] = readOBJ('spot.obj');
 Ni = vertexNormal(triangulation(Fi,Vi));    %returns unit normal vector
 
-[Vs,Fs] = subdivided_sphere(3);
-Ns = vertexNormal(triangulation(Fs,Vs));
+%[Vs,Fs] = subdivided_sphere(3);                            UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
+%Ns = vertexNormal(triangulation(Fs,Vs));                   UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
 
 [Vt, Ft] = readOBJ('cube.obj');
 Nt = vertexNormal(triangulation(Ft,Vt));
 
-[Mt , It] = min(acos((Ns*Nt')), [], 2);
-Nst = Nt(It, :);    % Fs -> Ft
+%[Mt , It] = min(acos((Ns*Nt')), [], 2);                   UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
+%Nst = Nt(It, :);    % Fs -> Ft                            UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
+%[Mi , Ii] = min(acos((Ni*Ns')), [], 2);                   UPDATE: REPLACED BY 15-18 TO GET ANGLE IN RANGE 0-2PI
+%Nit = Nst(Ii, :);   % Fi -> Fs -> Ft     Paper: T         UPDATE: REPLACED BY 15-19
 
-[Mi , Ii] = min(acos((Ni*Ns')), [], 2);
-Nit = Nst(Ii, :);   % Fi -> Fs -> Ft     Paper: T
-
+a = repelem(Ni, size(Nt, 1), 1); 
+b = repmat(Nt, size(Ni, 1), 1);
+angle = atan2(norm(cross(a, b, 2)), dot(a, b, 2));
+[M, I] = min(reshape(angle, size(Nt, 1), size(Ni, 1)), [], 1);
+Nit = Nt(I, :);   % Fi -> Fs -> Ft     Paper: T
 
 V = Vi;
 
