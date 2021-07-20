@@ -1,22 +1,18 @@
 [Vi,Fi] = readOBJ('spot.obj');
 Ni = vertexNormal(triangulation(Fi,Vi));    %returns unit normal vector
 
-%[Vs,Fs] = subdivided_sphere(3);                            UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
-%Ns = vertexNormal(triangulation(Fs,Vs));                   UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
 
 [Vt, Ft] = readOBJ('cube.obj');
 Nt = vertexNormal(triangulation(Ft,Vt));
 
-%[Mt , It] = min(acos((Ns*Nt')), [], 2);                   UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
-%Nst = Nt(It, :);    % Fs -> Ft                            UPDATE: ELIMINATED SPHERE, Nt IS GAUSS SPHERE
-%[Mi , Ii] = min(acos((Ni*Ns')), [], 2);                   UPDATE: REPLACED BY 15-18 TO GET ANGLE IN RANGE 0-2PI
-%Nit = Nst(Ii, :);   % Fi -> Fs -> Ft     Paper: T         UPDATE: REPLACED BY 15-19
+[Mi , Ii] = min(acos((Ni*Nt')), [], 2);                   
+Nit = Nt(Ii, :);   % Fi -> Fs -> Ft     Paper: T         
 
-a = repelem(Ni, size(Nt, 1), 1); 
-b = repmat(Nt, size(Ni, 1), 1);
-angle = atan2(norm(cross(a, b, 2)), dot(a, b, 2));
-[M, I] = min(reshape(angle, size(Nt, 1), size(Ni, 1)), [], 1);
-Nit = Nt(I, :);   % Fi -> Fs -> Ft     Paper: T
+%a = repelem(Ni, size(Nt, 1), 1);                                   DON'T REQUIRE ANGLE IN 0-360 HEREFORE, ACOS WORKS JUST FINE.
+%b = repmat(Nt, size(Ni, 1), 1);
+%angle = atan2(norm(cross(a, b, 2)), dot(a, b, 2));
+%[M, I] = min(reshape(angle, size(Nt, 1), size(Ni, 1)), [], 1);
+%Nit = Nt(I, :);   % Fi -> Fs -> Ft     Paper: T
 
 V = Vi;
 
@@ -35,7 +31,7 @@ for f = 1:size(Fi, 1)
 end
 A = massmatrix(Vi, Fi, 'voronoi');
 
-lambda = 500;
+lambda = 1000;
 M1M2 = cell(size(Vi, 1));
 C = cotangent(Vi,Fi);
 for i = 1:size(Vi, 1)
@@ -92,4 +88,4 @@ for i = 1:100
     end
 end
 
-t = tsurf(Fi,V, 'EdgeColor', 'black');shading interp; axis equal;
+t = tsurf(Fi,V, 'EdgeColor', 'black'); axis equal;
